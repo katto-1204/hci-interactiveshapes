@@ -457,6 +457,35 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 /* ============================================================
+   MARQUEE — scroll-reactive speed boost
+============================================================ */
+(function initMarqueeScroll() {
+  const track = document.querySelector('.marquee-track');
+  if (!track) return;
+  const BASE = 10;         // default duration in seconds
+  const FAST = 2;          // fastest duration when scrolling hard
+  let lastScroll = 0, scrollVel = 0, currentDur = BASE, rafId = 0;
+  let decayTimer = null;
+
+  window.addEventListener('scroll', () => {
+    const now = performance.now();
+    const dy = Math.abs(window.scrollY - lastScroll);
+    scrollVel = Math.min(dy, 120);          // cap
+    lastScroll = window.scrollY;
+    if (decayTimer) clearTimeout(decayTimer);
+    decayTimer = setTimeout(() => { scrollVel = 0; }, 120);
+  }, { passive: true });
+
+  function tick() {
+    requestAnimationFrame(tick);
+    const targetDur = BASE - (scrollVel / 120) * (BASE - FAST);
+    currentDur += (targetDur - currentDur) * 0.12;
+    track.style.animationDuration = currentDur.toFixed(2) + 's';
+  }
+  tick();
+})();
+
+/* ============================================================
    INTERSECTION OBSERVER — ROW REVEAL
 ============================================================ */
 const rowObserver = new IntersectionObserver(entries => {

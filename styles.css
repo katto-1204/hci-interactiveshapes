@@ -366,7 +366,7 @@ nav {
 
 
 .marquee-wrap { overflow: hidden; white-space: nowrap; padding: 16px 0; border-top: 1px solid rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.06); }
-.marquee-track { display: inline-flex; align-items: center; gap: clamp(16px, 3vw, 32px); animation: marquee 18s linear infinite; font-family: 'Bebas Neue', sans-serif; font-size: clamp(13px, 2vw, 18px); letter-spacing: .3em; color: rgba(255,255,255,.15); }
+.marquee-track { display: inline-flex; align-items: center; gap: clamp(16px, 3vw, 32px); animation: marquee 10s linear infinite; font-family: 'Bebas Neue', sans-serif; font-size: clamp(13px, 2vw, 18px); letter-spacing: .3em; color: rgba(255,255,255,.15); }
 .marquee-track svg { width: 10px; height: 10px; color: var(--orange); flex-shrink: 0; }
 @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
