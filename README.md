@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/preview.png" alt="GEOFORM Preview" width="100%" />
+  <img src="INTERACTIVE SHAPES.png" alt="GEOFORM Preview" width="100%" />
 </p>
 
 <h1 align="center">GEOFORM — Interactive 3D Art Gallery</h1>
@@ -67,8 +67,6 @@
 ├── index.html      # Main page — loader, instructions, landing, gallery, credits
 ├── styles.css      # All styling, animations, responsive design
 ├── script.js       # Audio, cursor, Three.js scenes, parallax, interactions
-├── assets/
-│   └── preview.png # Full-page screenshot
 └── README.md
 ```
 
