@@ -654,7 +654,7 @@ nav {
 /* Mobile landscape & small tablets */
 @media (max-width: 768px) {
   .pg-hud-legend {
-    top: auto; bottom: clamp(80px, 14vh, 110px);
+    top: 12px; bottom: auto;
     left: 50%; transform: translateX(-50%);
     gap: clamp(8px, 2vw, 14px); flex-wrap: wrap; justify-content: center;
     max-width: 95vw;
@@ -686,7 +686,7 @@ nav {
 
 /* Phone portrait */
 @media (max-width: 480px) {
-  .pg-hud-legend { bottom: clamp(70px, 16vh, 100px); gap: 6px; }
+  .pg-hud-legend { top: 10px; bottom: auto; gap: 6px; }
   .pg-legend-key { padding: 2px 5px; font-size: 7px; }
 
   .pg-hud-name { font-size: clamp(16px, 6vw, 22px); }
@@ -709,7 +709,7 @@ nav {
   .pg-hud-tag { display: none; }
   #playground-close { top: 6px; right: 8px; width: 32px; height: 32px; }
 
-  .pg-hud-legend { bottom: 56px; }
+  .pg-hud-legend { top: 6px; bottom: auto; }
   .pg-hud-bottom { bottom: 4px; }
   .pg-shape-btn { padding: 4px 7px; font-size: 7px; }
 
