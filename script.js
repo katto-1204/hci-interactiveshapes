@@ -473,8 +473,21 @@ const creditsObs = new IntersectionObserver(entries => {
 const cName = document.querySelector('.credits-name');
 if (cName) creditsObs.observe(cName);
 
+// Credits section staggered entrance
+const creditsSectionObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+const creditsEl = document.getElementById('s-credits');
+if (creditsEl) creditsSectionObs.observe(creditsEl);
+
+// Section dividers expand on scroll
+const dividerObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.5 });
+document.querySelectorAll('.section-divider').forEach(d => dividerObs.observe(d));
+
 /* ============================================================
-   SCROLL PARALLAX
+   SCROLL PARALLAX — smooth lerp
 ============================================================ */
 (function initSectionParallax() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -484,47 +497,51 @@ if (cName) creditsObs.observe(cName);
   const creditsBg = document.querySelector('.credits-bg');
   const creditsDeco = document.querySelector('.credits-deco');
 
-  let ticking = false;
+  let landingY = 0, landingTarget = 0;
+  const rowInfoY = rows.map(() => ({ curr: 0, target: 0 }));
+  const rowCanvasY = rows.map(() => ({ curr: 0, target: 0 }));
+  let creditsBgY = 0, creditsBgTarget = 0;
+  let creditsDecoY = 0, creditsDecoTarget = 0;
+  const LERP = 0.07;
 
-  function applyParallax() {
-    const viewportH = window.innerHeight || 1;
+  function updateTargets() {
     const scrollY = window.scrollY || 0;
-
-    // Landing section: stronger parallax feel
-    if (landingContent) {
-      landingContent.style.transform = `translate3d(0, ${Math.round(scrollY * 0.24)}px, 0)`;
-    }
-
-    // Gallery rows: opposing subtle drifts for depth
+    const viewportH = window.innerHeight || 1;
+    landingTarget = scrollY * 0.3;
     rows.forEach((row, idx) => {
       const rect = row.getBoundingClientRect();
       const centerOffset = rect.top + rect.height / 2 - viewportH / 2;
       const normalized = Math.max(-1, Math.min(1, centerOffset / viewportH));
+      const dir = idx % 2 === 0 ? 1 : -1;
+      rowInfoY[idx].target = normalized * -40 * dir;
+      rowCanvasY[idx].target = normalized * 28 * dir;
+    });
+    creditsBgTarget = scrollY * -0.06;
+    creditsDecoTarget = scrollY * -0.12;
+  }
 
+  function tick() {
+    requestAnimationFrame(tick);
+    landingY += (landingTarget - landingY) * LERP;
+    if (landingContent) landingContent.style.transform = `translate3d(0, ${landingY.toFixed(1)}px, 0)`;
+    rows.forEach((row, idx) => {
+      rowInfoY[idx].curr += (rowInfoY[idx].target - rowInfoY[idx].curr) * LERP;
+      rowCanvasY[idx].curr += (rowCanvasY[idx].target - rowCanvasY[idx].curr) * LERP;
       const info = row.querySelector('.shape-info');
       const canvasWrap = row.querySelector('.shape-canvas-wrap');
-      const dir = idx % 2 === 0 ? 1 : -1;
-
-      if (info) info.style.transform = `translate3d(0, ${Math.round(normalized * -28 * dir)}px, 0)`;
-      if (canvasWrap) canvasWrap.style.transform = `translate3d(0, ${Math.round(normalized * 20 * dir)}px, 0)`;
+      if (info) info.style.transform = `translate3d(0, ${rowInfoY[idx].curr.toFixed(1)}px, 0)`;
+      if (canvasWrap) canvasWrap.style.transform = `translate3d(0, ${rowCanvasY[idx].curr.toFixed(1)}px, 0)`;
     });
-
-    // Credits depth layers
-    if (creditsBg) creditsBg.style.transform = `translate3d(0, ${Math.round(scrollY * -0.05)}px, 0)`;
-    if (creditsDeco) creditsDeco.style.transform = `translate3d(-50%, ${Math.round(scrollY * -0.1)}px, 0)`;
-
-    ticking = false;
+    creditsBgY += (creditsBgTarget - creditsBgY) * LERP;
+    creditsDecoY += (creditsDecoTarget - creditsDecoY) * LERP;
+    if (creditsBg) creditsBg.style.transform = `translate3d(0, ${creditsBgY.toFixed(1)}px, 0)`;
+    if (creditsDeco) creditsDeco.style.transform = `translate3d(-50%, ${creditsDecoY.toFixed(1)}px, 0)`;
   }
 
-  function requestParallaxFrame() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(applyParallax);
-  }
-
-  window.addEventListener('scroll', requestParallaxFrame, { passive: true });
-  window.addEventListener('resize', requestParallaxFrame);
-  applyParallax();
+  window.addEventListener('scroll', updateTargets, { passive: true });
+  window.addEventListener('resize', updateTargets);
+  updateTargets();
+  tick();
 })();
 
 /* ============================================================
@@ -851,9 +868,8 @@ document.querySelectorAll('.shape-canvas-wrap').forEach((wrap, i) => createShape
    HOVER STAR-REPO POPUP (Credits GitHub button)
 ============================================================ */
 (function initRepoStarHoverPopup() {
-  const creditsSection = document.getElementById('s-credits');
   const githubBtn = document.querySelector('.credits-btns a[href="https://github.com/katto-1204"]');
-  if (!creditsSection || !githubBtn) return;
+  if (!githubBtn) return;
 
   const repoUrl = 'https://github.com/katto-1204/hci-interactiveshapes';
   const popup = document.createElement('a');
@@ -868,43 +884,29 @@ document.querySelectorAll('.shape-canvas-wrap').forEach((wrap, i) => createShape
       <polyline points="12 5 19 12 12 19"></polyline>
     </svg>
   `;
-  creditsSection.appendChild(popup);
+  document.body.appendChild(popup);
+
+  let hideTimer = null;
 
   function positionPopup() {
-    const secRect = creditsSection.getBoundingClientRect();
     const btnRect = githubBtn.getBoundingClientRect();
-    if (!secRect.width || !btnRect.width) return;
-
-    const left = btnRect.left - secRect.left + (btnRect.width / 2) - (popup.offsetWidth / 2);
-    const top = btnRect.top - secRect.top + btnRect.height + 10;
-    const clampedLeft = Math.max(8, Math.min(secRect.width - popup.offsetWidth - 8, left));
-
-    popup.style.left = `${clampedLeft}px`;
-    popup.style.top = `${top}px`;
+    const popW = popup.offsetWidth || 160;
+    let left = btnRect.left + btnRect.width / 2 - popW / 2;
+    left = Math.max(8, Math.min(window.innerWidth - popW - 8, left));
+    popup.style.left = left + 'px';
+    popup.style.top = (btnRect.bottom + 10) + 'px';
   }
 
   function showPopup() {
-    if (hideTimer) {
-      clearTimeout(hideTimer);
-      hideTimer = null;
-    }
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
     positionPopup();
     popup.classList.add('show');
   }
 
-  function hidePopupNow() {
-    popup.classList.remove('show');
-  }
-
   function hidePopupSoon() {
     if (hideTimer) clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-      popup.classList.remove('show');
-      hideTimer = null;
-    }, 140);
+    hideTimer = setTimeout(() => { popup.classList.remove('show'); hideTimer = null; }, 220);
   }
-
-  let hideTimer = null;
 
   githubBtn.addEventListener('mouseenter', showPopup);
   githubBtn.addEventListener('mouseleave', hidePopupSoon);
@@ -912,11 +914,6 @@ document.querySelectorAll('.shape-canvas-wrap').forEach((wrap, i) => createShape
   githubBtn.addEventListener('blur', hidePopupSoon);
   popup.addEventListener('mouseenter', showPopup);
   popup.addEventListener('mouseleave', hidePopupSoon);
-  popup.addEventListener('focus', showPopup);
-  popup.addEventListener('blur', hidePopupSoon);
-  popup.addEventListener('click', () => {
-    hidePopupNow();
-  });
   window.addEventListener('resize', () => { if (popup.classList.contains('show')) positionPopup(); });
   window.addEventListener('scroll', () => { if (popup.classList.contains('show')) positionPopup(); }, { passive: true });
 })();

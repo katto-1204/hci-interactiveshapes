@@ -366,7 +366,7 @@ nav {
 
 
 .marquee-wrap { overflow: hidden; white-space: nowrap; padding: 16px 0; border-top: 1px solid rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.06); }
-.marquee-track { display: inline-flex; align-items: center; gap: clamp(16px, 3vw, 32px); animation: marquee 72s linear infinite; font-family: 'Bebas Neue', sans-serif; font-size: clamp(13px, 2vw, 18px); letter-spacing: .3em; color: rgba(255,255,255,.15); }
+.marquee-track { display: inline-flex; align-items: center; gap: clamp(16px, 3vw, 32px); animation: marquee 18s linear infinite; font-family: 'Bebas Neue', sans-serif; font-size: clamp(13px, 2vw, 18px); letter-spacing: .3em; color: rgba(255,255,255,.15); }
 .marquee-track svg { width: 10px; height: 10px; color: var(--orange); flex-shrink: 0; }
 @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
@@ -462,7 +462,8 @@ nav {
 .orbit-label { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); font-family: 'Space Mono', monospace; font-size: clamp(7px, 1.1vw, 9px); letter-spacing: .3em; color: var(--yellow); background: rgba(8,8,8,.8); padding: 4px 12px; white-space: nowrap; }
 
 
-.section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent); margin: 0 clamp(20px, 5vw, 60px); }
+.section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent); margin: 0 clamp(20px, 5vw, 60px); transform: scaleX(0); transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.section-divider.visible { transform: scaleX(1); }
 
 
 #s-credits { min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: clamp(60px, 10vw, 120px) clamp(20px, 5vw, 40px); }
@@ -489,10 +490,39 @@ nav {
 .threejs-tag svg { width: 10px; height: 10px; flex-shrink: 0; }
 .credits-course { margin-top: clamp(32px, 5vw, 48px); font-family: 'Space Mono', monospace; font-size: clamp(8px, 1.2vw, 11px); letter-spacing: .3em; color: rgba(255,255,255,.2); text-align: center; position: relative; z-index: 2; border-top: 1px solid rgba(255,255,255,.06); padding-top: clamp(16px, 2vw, 24px); width: 100%; max-width: 480px; text-transform: uppercase; }
 
+/* ============================================================
+   SCROLL-TRIGGERED & ENTRANCE ANIMATIONS
+============================================================ */
+.section-num { animation: numDrift 10s ease-in-out infinite; }
+@keyframes numDrift { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(25px)} }
+
+.spotlight-beam { animation: spotlightSway 7s ease-in-out infinite; }
+@keyframes spotlightSway { 0%,100%{transform:translateX(-50%) skewX(0deg)} 50%{transform:translateX(-45%) skewX(2deg)} }
+
+.shape-row.visible .shape-tag { animation: tagGlowPulse 3s ease-in-out infinite 0.8s; }
+@keyframes tagGlowPulse { 0%,100%{text-shadow:0 0 0 transparent} 50%{text-shadow:0 0 14px rgba(255,77,0,.35)} }
+
+.marquee-track svg { animation: marqueeStar 2s ease-in-out infinite; }
+@keyframes marqueeStar { 0%,100%{filter:drop-shadow(0 0 0 transparent)} 50%{filter:drop-shadow(0 0 6px rgba(255,77,0,.5))} }
+
+.btn:hover { box-shadow: 0 0 24px rgba(255,77,0,.25), 0 0 48px rgba(255,77,0,.08); }
+.btn.accent:hover { box-shadow: 0 0 24px rgba(255,215,0,.3), 0 0 48px rgba(255,215,0,.1); }
+
+#s-credits .credits-label,
+#s-credits .credits-role,
+#s-credits .credits-btns,
+#s-credits .credits-course { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+#s-credits.visible .credits-label { opacity: 1; transform: translateY(0); transition-delay: 0s; }
+#s-credits.visible .credits-role { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+#s-credits.visible .credits-btns { opacity: 1; transform: translateY(0); transition-delay: 0.6s; }
+#s-credits.visible .credits-course { opacity: 1; transform: translateY(0); transition-delay: 0.9s; }
+
+.shape-row .shape-info, .shape-row .shape-canvas-wrap { will-change: transform; }
+
 /* Hover popup behind GitHub button */
 .repo-star-hover-popup {
-  position: absolute;
-  z-index: 1;
+  position: fixed;
+  z-index: 10000;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -509,6 +539,7 @@ nav {
   opacity: 0;
   transform: translate3d(0, 14px, 0) scale(.96);
   transition: opacity .26s ease, transform .26s ease;
+  cursor: pointer;
   pointer-events: none;
 }
 .repo-star-hover-popup.show {
@@ -531,24 +562,9 @@ nav {
 
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
+  /* Only disable large-motion animations; keep decorative & micro animations */
+  .landing-content, .shape-info, .shape-canvas-wrap, .credits-bg, .credits-deco {
     transition-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
   }
-
-  /* Keep marquee readable instead of effectively hyper-speed cycling. */
-  .marquee-track {
-    animation: marquee 96s linear infinite !important;
-  }
-
-  .repo-star-hover-popup {
-    transition: none !important;
-    opacity: .96 !important;
-    transform: none !important;
-  }
-
-  .repo-star-hover-popup.show .repo-star-arrow {
-    animation: none !important;
-  }
+  .scroll-arrow { animation: none !important; }
 }
