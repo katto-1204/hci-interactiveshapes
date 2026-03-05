@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<title>GEOFORM — Catherine Arnado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="noise"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="progress"></div>
+
+<!-- SOUND TOGGLE -->
+<button id="sound-btn" title="Toggle Sound" aria-label="Toggle ambient sound">
+  <svg id="sound-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+    <path d="M15.54 8.46a5 5 0 010 7.07"/>
+    <path d="M19.07 4.93a10 10 0 010 14.14"/>
+  </svg>
+  <svg id="sound-icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+    <line x1="23" y1="9" x2="17" y2="15"/>
+    <line x1="17" y1="9" x2="23" y2="15"/>
+  </svg>
+</button>
+
+<!-- WEBGL INFO BTN + TAB TOAST -->
+<div id="webgl-btn-wrap">
+  <button id="webgl-btn" title="WebGL Live Stats (TAB)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <rect x="2" y="3" width="20" height="14" rx="2"/>
+      <path d="M8 21h8M12 17v4"/>
+      <path d="M6 8l3 3-3 3M11 14h6"/>
+    </svg>
+    <span>WebGL</span>
+  </button>
+  <div id="tab-toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+    Press TAB to see WebGL render
+  </div>
+</div>
+
+<!-- WEBGL LIVE STATS PANEL -->
+<div id="webgl-panel">
+  <button id="webgl-close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+  <div class="webgl-panel-inner">
+    <div class="webgl-tag">// LIVE RENDER ANALYTICS</div>
+    <h2 class="webgl-title">WebGL &amp;<br>Three.js</h2>
+
+    <!-- LIVE STATS DASHBOARD -->
+    <div class="wgl-dashboard">
+      <div class="wgl-stat-card">
+        <div class="wgl-stat-label">FRAMES / SEC</div>
+        <div class="wgl-stat-value" id="wgl-fps">--</div>
+        <canvas class="wgl-sparkline" id="spark-fps" width="120" height="32"></canvas>
+      </div>
+      <div class="wgl-stat-card">
+        <div class="wgl-stat-label">RENDER TIME</div>
+        <div class="wgl-stat-value" id="wgl-ms">-- <span>ms</span></div>
+        <canvas class="wgl-sparkline" id="spark-ms" width="120" height="32"></canvas>
+      </div>
+      <div class="wgl-stat-card">
+        <div class="wgl-stat-label">DRAW CALLS</div>
+        <div class="wgl-stat-value" id="wgl-calls">--</div>
+        <canvas class="wgl-sparkline" id="spark-calls" width="120" height="32"></canvas>
+      </div>
+      <div class="wgl-stat-card">
+        <div class="wgl-stat-label">TRIANGLES</div>
+        <div class="wgl-stat-value" id="wgl-tris">--</div>
+        <canvas class="wgl-sparkline" id="spark-tris" width="120" height="32"></canvas>
+      </div>
+      <div class="wgl-stat-card">
+        <div class="wgl-stat-label">GEOMETRIES</div>
+        <div class="wgl-stat-value" id="wgl-geo">--</div>
+        <canvas class="wgl-sparkline" id="spark-geo" width="120" height="32"></canvas>
+      </div>
+      <div class="wgl-stat-card">
+        <div class="wgl-stat-label">TEXTURES</div>
+        <div class="wgl-stat-value" id="wgl-tex">--</div>
+        <canvas class="wgl-sparkline" id="spark-tex" width="120" height="32"></canvas>
+      </div>
+    </div>
+
+    <!-- FPS BAR GRAPH -->
+    <div class="wgl-graph-wrap">
+      <div class="wgl-graph-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        FPS Over Time
+      </div>
+      <canvas id="fps-graph" width="700" height="80"></canvas>
+    </div>
+
+    <!-- PIPELINE BREAKDOWN -->
+    <div class="wgl-blocks">
+      <div class="webgl-block">
+        <div class="webgl-block-num">01</div>
+        <h3>WebGL Rendering Pipeline</h3>
+        <p>WebGL issues GPU draw calls via JavaScript. Each frame, Three.js traverses the scene graph, batches geometries, uploads uniform data (matrices, lights), then executes vertex shaders to transform 3D coordinates into clip-space, followed by rasterization and fragment shaders that compute per-pixel color. The stats above update in real time — draw calls spike when multiple meshes with unique materials are visible.</p>
+      </div>
+      <div class="webgl-block">
+        <div class="webgl-block-num">02</div>
+        <h3>How Three.js Abstracts WebGL</h3>
+        <p>Without Three.js, each mesh requires manual VAO/VBO setup, shader compilation, and matrix math. Three.js compiles <code>MeshStandardMaterial</code> into a complete GLSL program internally, manages the WebGLRenderer's state machine, and handles the requestAnimationFrame loop. The triangle count shown above reflects vertex buffer sizes Three.js maintains on the GPU.</p>
+      </div>
+      <div class="webgl-block">
+        <div class="webgl-block-num">03</div>
+        <h3>Active Materials</h3>
+        <p><strong>MeshStandardMaterial</strong> — PBR: metalness + roughness uniforms fed to the BRDF shader.<br>
+        <strong>MeshPhongMaterial</strong> — Phong model: ambient + diffuse + specular terms, cheaper than PBR.<br>
+        <strong>MeshLambertMaterial</strong> — diffuse-only, computed per vertex. Minimal fragment shader cost.<br>
+        <strong>Wireframe</strong> — <code>GL_LINES</code> draw mode, bypasses fragment shading entirely.</p>
+      </div>
+    </div>
+    <div class="webgl-footer">Press <kbd>TAB</kbd> or click close to dismiss</div>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-title">GEOFORM</div>
+  <div class="loader-sub">3D Art Gallery — Catherine Arnado</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
+  <div class="loader-pct" id="loader-pct">0%</div>
+</div>
+
+<!-- INSTRUCTIONS SCREEN -->
+<div id="instructions-screen">
+  <div class="inst-inner">
+    <div class="inst-badge">HC1 102L · Activity Briefing</div>
+    <div class="inst-from">
+      <span class="inst-from-label">FROM</span>
+      <span class="inst-from-name">Sir Maubert Fred Yretarino</span>
+      <span class="inst-from-time">40 pts · Due 11:59 PM</span>
+    </div>
+    <h2 class="inst-title">Interactive 3D Shape<br>Gallery with Three.js</h2>
+    <div class="inst-body">
+      <div class="inst-col">
+        <div class="inst-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Task
+        </div>
+        <p>Create an interactive 3D scene displaying <strong>minimum 4 different primitives</strong> using Three.js. Demonstrate understanding of Three.js core concepts: varied geometries, materials, lighting, and interactivity.</p>
+        <div class="inst-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Core Elements Required
+        </div>
+        <ul>
+          <li>Scene setup with camera and renderer</li>
+          <li>At least 4 different geometry types</li>
+          <li>Different materials: Standard, Wireframe, Phong, Lambert</li>
+          <li>Ambient and directional lighting</li>
+          <li>OrbitControls for navigation <em>(optional)</em></li>
+        </ul>
+        <div class="inst-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Interactivity Features
+        </div>
+        <ul>
+          <li>Hover effects — scale/color change on mouseover</li>
+          <li>Click to rotate/spin individual shapes</li>
+          <li>Theme: Abstract Art Gallery or Geometric Playground</li>
+        </ul>
+        <div class="inst-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          Submission
+        </div>
+        <p>CodePen link only.</p>
+      </div>
+      <div class="inst-col">
+        <div class="inst-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Grading Criteria
+        </div>
+        <div class="inst-grade"><span>4+ distinct geometries implemented</span><span class="inst-pts">25% · 10pts</span></div>
+        <div class="inst-grade"><span>Lighting &amp; materials applied correctly</span><span class="inst-pts">25% · 10pts</span></div>
+        <div class="inst-grade"><span>Interactivity (click/hover/controls) functional</span><span class="inst-pts">25% · 10pts</span></div>
+        <div class="inst-grade"><span>Code organization</span><span class="inst-pts">25% · 10pts</span></div>
+        <div class="inst-total">TOTAL: <strong>40 pts</strong></div>
+        <div class="inst-tip">
+          <div class="inst-tip-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            This Gallery Demonstrates
+          </div>
+          <ul>
+            <li>5 unique 3D primitives with Three.js</li>
+            <li>All 4 material types with live switching</li>
+            <li>Draggable shapes + long-press orbit controls</li>
+            <li>Scene switching (Gallery / Space / Studio)</li>
+            <li>Scroll-reveal parallax animations</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button id="inst-enter">
+      ENTER GALLERY
+      <svg class="inst-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#s-landing" class="nav-logo">GEO<span>FORM</span></a>
+</nav>
+
+<!-- SECTION 1: LANDING -->
+<section id="s-landing">
+  <canvas id="three-canvas"></canvas>
+  <div class="landing-content">
+    <div class="landing-eyebrow">Interactive 3D Art Gallery</div>
+    <h1 class="landing-h1">
+      <span>GEO</span>
+      <span>FORM</span>
+    </h1>
+    <p class="landing-sub">Five shapes. Infinite dimensions. — Scroll to explore</p>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">
+    CUBE
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    SPHERE
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    TORUS
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    CONE
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    OCTAHEDRON
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    CUBE
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    SPHERE
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    TORUS
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    CONE
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+    OCTAHEDRON
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2.5 4.5h5L12 9l1.5 4.5L8 11l-5.5 2.5L4 9 .5 5.5h5z"/></svg>
+  </div>
+</div>
+
+<!-- SECTION 2: GALLERY -->
+<section id="s-gallery">
+  <div class="section-num" aria-hidden="true">01</div>
+
+  <!-- SHAPE 1: CUBE -->
+  <div class="shape-row row-1" id="row-1">
+    <div class="shape-canvas-wrap" id="cv-1">
+      <div class="spotlight-beam"></div>
+    </div>
+    <div class="shape-info">
+      <div class="shape-number" aria-hidden="true">01</div>
+      <div class="shape-tag">Primitive · Geometry · Form</div>
+      <h2 class="shape-title">THE CUBE</h2>
+      <p class="shape-desc">The most fundamental of all 3D primitives — six faces, eight vertices, twelve edges. A symbol of stability and order. Each surface reflects light differently, creating a dance between shadow and illumination.</p>
+      <div class="shape-stats">
+        <div class="stat"><span class="stat-label">Faces</span><span class="stat-value">6</span></div>
+        <div class="stat"><span class="stat-label">Vertices</span><span class="stat-value">8</span></div>
+        <div class="stat"><span class="stat-label">Edges</span><span class="stat-value">12</span></div>
+      </div>
+      <div class="shape-interact-hint">
+        <div class="hint-dot"></div>
+        CLICK SPIN · DRAG · LONG-PRESS ORBIT
+      </div>
+      <!-- CONTROLS MOVED HERE — UNDER INTERACT HINT -->
+      <div class="shape-controls" data-idx="0">
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <div class="ctrl-label">MATERIAL</div>
+            <div class="mat-btns">
+              <button class="mat-btn active" data-mat="standard">Standard</button>
+              <button class="mat-btn" data-mat="wireframe">Wireframe</button>
+              <button class="mat-btn" data-mat="phong">Phong</button>
+              <button class="mat-btn" data-mat="lambert">Lambert</button>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">SCENE</div>
+            <div class="scene-btns">
+              <button class="scene-btn active" data-scene="gallery">Gallery</button>
+              <button class="scene-btn" data-scene="space">Space</button>
+              <button class="scene-btn" data-scene="studio">Studio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SHAPE 2: SPHERE -->
+  <div class="shape-row row-2 reverse" id="row-2">
+    <div class="shape-canvas-wrap" id="cv-2">
+      <div class="spotlight-beam"></div>
+    </div>
+    <div class="shape-info">
+      <div class="shape-number" aria-hidden="true">02</div>
+      <div class="shape-tag">Organic · Fluid · Perfect</div>
+      <h2 class="shape-title">THE SPHERE</h2>
+      <p class="shape-desc">Infinite symmetry in every direction. The sphere is nature's preferred form — from planets to soap bubbles. Its perfectly smooth surface creates a mirror-like interplay with the gallery's ambient lighting.</p>
+      <div class="shape-stats">
+        <div class="stat"><span class="stat-label">Faces</span><span class="stat-value">∞</span></div>
+        <div class="stat"><span class="stat-label">Symmetry</span><span class="stat-value">360°</span></div>
+        <div class="stat"><span class="stat-label">Type</span><span class="stat-value">MeshPhong</span></div>
+      </div>
+      <div class="shape-interact-hint">
+        <div class="hint-dot"></div>
+        CLICK SPIN · DRAG · LONG-PRESS ORBIT
+      </div>
+      <div class="shape-controls" data-idx="1">
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <div class="ctrl-label">MATERIAL</div>
+            <div class="mat-btns">
+              <button class="mat-btn" data-mat="standard">Standard</button>
+              <button class="mat-btn active" data-mat="phong">Phong</button>
+              <button class="mat-btn" data-mat="wireframe">Wireframe</button>
+              <button class="mat-btn" data-mat="lambert">Lambert</button>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">SCENE</div>
+            <div class="scene-btns">
+              <button class="scene-btn active" data-scene="gallery">Gallery</button>
+              <button class="scene-btn" data-scene="space">Space</button>
+              <button class="scene-btn" data-scene="studio">Studio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SHAPE 3: TORUS -->
+  <div class="shape-row row-3" id="row-3">
+    <div class="shape-canvas-wrap" id="cv-3">
+      <div class="spotlight-beam"></div>
+    </div>
+    <div class="shape-info">
+      <div class="shape-number" aria-hidden="true">03</div>
+      <div class="shape-tag">Topology · Paradox · Loop</div>
+      <h2 class="shape-title">THE TORUS</h2>
+      <p class="shape-desc">A loop with no beginning and no end — the torus defies intuition. Topologically equivalent to a coffee cup handle, it challenges our notion of surface and interior. Its wireframe structure exposes the mathematics beneath the form.</p>
+      <div class="shape-stats">
+        <div class="stat"><span class="stat-label">Genus</span><span class="stat-value">1</span></div>
+        <div class="stat"><span class="stat-label">Holes</span><span class="stat-value">1</span></div>
+        <div class="stat"><span class="stat-label">Type</span><span class="stat-value">Standard</span></div>
+      </div>
+      <div class="shape-interact-hint">
+        <div class="hint-dot"></div>
+        CLICK SPIN · DRAG · LONG-PRESS ORBIT
+      </div>
+      <div class="shape-controls" data-idx="2">
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <div class="ctrl-label">MATERIAL</div>
+            <div class="mat-btns">
+              <button class="mat-btn" data-mat="standard">Standard</button>
+              <button class="mat-btn active" data-mat="wireframe">Wireframe</button>
+              <button class="mat-btn" data-mat="phong">Phong</button>
+              <button class="mat-btn" data-mat="lambert">Lambert</button>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">SCENE</div>
+            <div class="scene-btns">
+              <button class="scene-btn active" data-scene="gallery">Gallery</button>
+              <button class="scene-btn" data-scene="space">Space</button>
+              <button class="scene-btn" data-scene="studio">Studio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SHAPE 4: CONE -->
+  <div class="shape-row row-4 reverse" id="row-4">
+    <div class="shape-canvas-wrap" id="cv-4">
+      <div class="spotlight-beam"></div>
+    </div>
+    <div class="shape-info">
+      <div class="shape-number" aria-hidden="true">04</div>
+      <div class="shape-tag">Direction · Focus · Ascent</div>
+      <h2 class="shape-title">THE CONE</h2>
+      <p class="shape-desc">Aspiration made manifest — the cone converges from infinite base points to a single apex. Ancient pyramids echo this geometry, reaching toward the sky. Its gradient of shadow tells the story of convergence from chaos to a single, perfect point.</p>
+      <div class="shape-stats">
+        <div class="stat"><span class="stat-label">Apex</span><span class="stat-value">1</span></div>
+        <div class="stat"><span class="stat-label">Base</span><span class="stat-value">Circle</span></div>
+        <div class="stat"><span class="stat-label">Type</span><span class="stat-value">Lambert</span></div>
+      </div>
+      <div class="shape-interact-hint">
+        <div class="hint-dot"></div>
+        CLICK SPIN · DRAG · LONG-PRESS ORBIT
+      </div>
+      <div class="shape-controls" data-idx="3">
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <div class="ctrl-label">MATERIAL</div>
+            <div class="mat-btns">
+              <button class="mat-btn" data-mat="standard">Standard</button>
+              <button class="mat-btn" data-mat="wireframe">Wireframe</button>
+              <button class="mat-btn" data-mat="phong">Phong</button>
+              <button class="mat-btn active" data-mat="lambert">Lambert</button>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">SCENE</div>
+            <div class="scene-btns">
+              <button class="scene-btn active" data-scene="gallery">Gallery</button>
+              <button class="scene-btn" data-scene="space">Space</button>
+              <button class="scene-btn" data-scene="studio">Studio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SHAPE 5: OCTAHEDRON -->
+  <div class="shape-row row-5" id="row-5">
+    <div class="shape-canvas-wrap" id="cv-5">
+      <div class="spotlight-beam"></div>
+    </div>
+    <div class="shape-info">
+      <div class="shape-number" aria-hidden="true">05</div>
+      <div class="shape-tag">Crystal · Angular · Sacred</div>
+      <h2 class="shape-title">THE OCTAHEDRON</h2>
+      <p class="shape-desc">Eight triangular faces converge in crystalline perfection — one of Plato's five sacred solids, associated with air and intellect. Its angular form catches light in harsh, dramatic facets. A diamond in the rough, hovering in space.</p>
+      <div class="shape-stats">
+        <div class="stat"><span class="stat-label">Faces</span><span class="stat-value">8</span></div>
+        <div class="stat"><span class="stat-label">Vertices</span><span class="stat-value">6</span></div>
+        <div class="stat"><span class="stat-label">Type</span><span class="stat-value">Phong</span></div>
+      </div>
+      <div class="shape-interact-hint">
+        <div class="hint-dot"></div>
+        CLICK SPIN · DRAG · LONG-PRESS ORBIT
+      </div>
+      <div class="shape-controls" data-idx="4">
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <div class="ctrl-label">MATERIAL</div>
+            <div class="mat-btns">
+              <button class="mat-btn" data-mat="standard">Standard</button>
+              <button class="mat-btn" data-mat="wireframe">Wireframe</button>
+              <button class="mat-btn active" data-mat="phong">Phong</button>
+              <button class="mat-btn" data-mat="lambert">Lambert</button>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">SCENE</div>
+            <div class="scene-btns">
+              <button class="scene-btn active" data-scene="gallery">Gallery</button>
+              <button class="scene-btn" data-scene="space">Space</button>
+              <button class="scene-btn" data-scene="studio">Studio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: CREDITS -->
+<section id="s-credits">
+  <div class="credits-bg"></div>
+  <div class="credits-deco" aria-hidden="true">CA</div>
+  <p class="credits-label">CREATED BY</p>
+  <h2 class="credits-name">Catherine<br>Arnado</h2>
+  <p class="credits-role">// Developer · Designer · Dreamer</p>
+  <div class="credits-btns">
+    <a href="https://kattojsx.vercel.app/" class="btn accent" target="_blank" rel="noopener">
+      <span class="btn-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        Portfolio
+      </span>
+      <div class="threejs-tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/></svg>
+        I used Three.js there!
+      </div>
+    </a>
+    <a href="mailto:catherine.arnado@hcdc.edu.ph" class="btn">
+      <span class="btn-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email Me
+      </span>
+    </a>
+    <a href="https://github.com/katto-1204" class="btn" target="_blank" rel="noopener">
+      <span class="btn-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        GitHub
+      </span>
+    </a>
+  </div>
+  <div class="credits-course">HC1 102L: Interactive Shapes Using Three.js</div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
