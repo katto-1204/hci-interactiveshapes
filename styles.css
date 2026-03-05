@@ -156,7 +156,7 @@ body {
 .inst-section-title svg { width: 12px; height: 12px; flex-shrink: 0; }
 .inst-col p { font-family: 'Syne', sans-serif; font-size: clamp(11px, 1.5vw, 13px); line-height: 1.7; color: rgba(255,255,255,.6); }
 .inst-col ul { list-style: none; font-family: 'Space Mono', monospace; font-size: clamp(10px, 1.3vw, 11px); line-height: 2; color: rgba(255,255,255,.5); }
-.inst-col ul li::before { content: 'â†’ '; color: var(--orange); }
+.inst-col ul li::before { content: 'GåÆ '; color: var(--orange); }
 .inst-col strong { color: var(--white); }
 .inst-col em { color: rgba(255,255,255,.3); font-style: italic; }
 .inst-grade { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-family: 'Syne', sans-serif; font-size: clamp(10px, 1.4vw, 12px); color: rgba(255,255,255,.6); gap: 8px; }
@@ -397,7 +397,7 @@ nav {
 
 .spotlight-beam { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: clamp(160px, 30vw, 300px); height: 100%; background: radial-gradient(ellipse 200px 600px at 50% -10%, rgba(255,255,255,.07) 0%, transparent 70%); pointer-events: none; z-index: 1; }
 
-/* SHAPE INFO â€” controls now live here */
+/* SHAPE INFO GÇö controls now live here */
 .shape-info {
   display: flex; flex-direction: column; justify-content: center;
   padding: clamp(40px, 6vw, 80px) clamp(24px, 5vw, 60px);
@@ -437,7 +437,7 @@ nav {
 .row-5 .shape-title { color: var(--purple); }
 
 /* ============================================================
-   SHAPE CONTROLS â€” now inside .shape-info (below hint)
+   SHAPE CONTROLS GÇö now inside .shape-info (below hint)
 ============================================================ */
 .shape-controls {
   margin-top: 0;
