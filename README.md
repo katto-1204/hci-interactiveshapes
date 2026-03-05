@@ -2,7 +2,7 @@
   <img src="INTERACTIVE SHAPES.png" alt="GEOFORM Preview" width="100%" />
 </p>
 
-<h1 align="center">GEOFORM — Interactive 3D Art Gallery</h1>
+<h1 align="center">GEOFORM -- Interactive 3D Art Gallery</h1>
 
 <p align="center">
   <strong>Five shapes. Infinite dimensions.</strong><br>
@@ -18,16 +18,17 @@
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---|---|
-| **5 Interactive 3D Shapes** | Box, Sphere, Torus, Cone, Octahedron — each in its own WebGL scene |
-| **Material Switching** | Standard, Wireframe, Phong, Lambert — swap in real-time per shape |
+| **5 Interactive 3D Shapes** | Box, Sphere, Torus, Cone, Octahedron -- each in its own WebGL scene |
+| **Material Switching** | Standard, Wireframe, Phong, Lambert -- swap in real-time per shape |
 | **Scene Presets** | Gallery, Space, Studio lighting environments |
 | **Drag & Spin** | Click to spin, drag to move, long-press for orbit camera controls |
-| **WebGL Stats Panel** | Live FPS, render time, draw calls, triangles, geometries, textures — with sparkline graphs |
-| **Ambient Spatial Audio** | Web Audio API–driven space ambience: drone pads, sub-bass pulse, hi-hat shimmer, melodic arp |
+| **Geometric Playground** | Full-screen interactive playground with all 5 shapes in one scene |
+| **WebGL Stats Panel** | Live FPS, render time, draw calls, triangles, geometries, textures -- with sparkline graphs |
+| **Ambient Spatial Audio** | Web Audio API-driven space ambience: drone pads, sub-bass pulse, hi-hat shimmer, melodic arp |
 | **Scroll-Reactive Marquee** | Shape marquee that accelerates with scroll velocity |
 | **Smooth Parallax** | Lerp-based parallax across all sections with eased in/out motion |
 | **Custom Cursor** | Dot + ring follower with hover scaling and blend-mode effects |
@@ -36,17 +37,17 @@
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
-- **Three.js r128** — WebGL 3D rendering (CDN)
-- **Web Audio API** — Procedural ambient music & SFX
-- **Vanilla JavaScript** — No frameworks, no build tools
-- **CSS3** — Custom properties, `clamp()`, `clip-path`, keyframe animations, intersection observers
-- **Google Fonts** — Bebas Neue, Space Mono, Syne
+- **Three.js r128** -- WebGL 3D rendering (CDN)
+- **Web Audio API** -- Procedural ambient music and SFX
+- **Vanilla JavaScript** -- No frameworks, no build tools
+- **CSS3** -- Custom properties, `clamp()`, `clip-path`, keyframe animations, intersection observers
+- **Google Fonts** -- Bebas Neue, Space Mono, Syne
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Clone the repo**
    ```bash
@@ -54,25 +55,25 @@
    cd hci-interactiveshapes
    ```
 
-2. **Open `index.html`** in any modern browser  
-   No build step needed — it's pure HTML/CSS/JS.
+2. **Open `index.html`** in any modern browser
+   No build step needed -- it's pure HTML/CSS/JS.
 
 3. **Enable sound** by clicking the sound toggle (bottom-right) after entering the gallery.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-├── index.html      # Main page — loader, instructions, landing, gallery, credits
-├── styles.css      # All styling, animations, responsive design
-├── script.js       # Audio, cursor, Three.js scenes, parallax, interactions
-└── README.md
+index.html      # Main page -- loader, instructions, landing, gallery, credits
+styles.css      # All styling, animations, responsive design
+script.js       # Audio, cursor, Three.js scenes, parallax, interactions
+README.md
 ```
 
 ---
 
-## 🎮 Controls
+## Controls
 
 | Action | Effect |
 |---|---|
@@ -83,36 +84,37 @@
 | **TAB** | Toggle WebGL stats panel |
 | **Material / Scene buttons** | Switch materials & lighting per shape |
 | **Sound button** | Toggle ambient audio |
+| **Playground button** | Open the geometric playground with all 5 shapes |
 | **Hover GitHub button** | Reveal "Star This Repo" popup |
 
 ---
 
-## 📋 Assignment Context
+## Assignment Context
 
-> **HC1 102L** — Interactive 3D Shape Gallery with Three.js  
-> **Instructor:** Sir Maubert Fred Yretarino  
-> **Points:** 40 pts  
+> **HC1 102L** -- Interactive 3D Shape Gallery with Three.js
+> **Instructor:** Sir Maubert Fred Yretarino
+> **Points:** 40 pts
 
 ### Requirements Met
-- ✅ Scene setup with camera and renderer  
-- ✅ 5 different geometry types (Box, Sphere, Torus, Cone, Octahedron)  
-- ✅ 4 material types (Standard, Wireframe, Phong, Lambert)  
-- ✅ Ambient and directional lighting  
-- ✅ Hover effects — emissive glow + scale on mouseover  
-- ✅ Click to spin individual shapes  
-- ✅ Theme: Abstract Art Gallery  
+- Scene setup with camera and renderer
+- 5 different geometry types (Box, Sphere, Torus, Cone, Octahedron)
+- 4 material types (Standard, Wireframe, Phong, Lambert)
+- Ambient and directional lighting
+- Hover effects -- emissive glow + scale on mouseover
+- Click to spin individual shapes
+- Theme: Abstract Art Gallery
 
 ---
 
-## 👩‍💻 Author
+## Author
 
-**Catherine Arnado**  
-Developer · Designer · Dreamer
+**Catherine Arnado**
+Developer / Designer / Dreamer
 
-- 🌐 [Portfolio](https://kattojsx.vercel.app/)
-- 📧 catherine.arnado@hcdc.edu.ph
-- 🐙 [GitHub](https://github.com/katto-1204)
+- [Portfolio](https://kattojsx.vercel.app/)
+- catherine.arnado@hcdc.edu.ph
+- [GitHub](https://github.com/katto-1204)
 
 ---
 
-<p align="center"><sub>Built with ☕ and Three.js</sub></p>
+<p align="center"><sub>Built with coffee and Three.js</sub></p>
